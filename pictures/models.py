@@ -30,16 +30,31 @@ class Picture(models.Model):
 
 class BrandCategory(models.Model):
 	name = models.CharField(max_length=255, unique=True)
+	def __unicode__(self):
+		try:
+			return str('{0}'.format(self.name)).decode().encode('utf-8')
+		except Exception as e:
+			print "Can't be displayed"
 
 
 class Brand(models.Model):
 	category = models.ForeignKey(BrandCategory, null=True, blank=True)
 	name = models.CharField(max_length=255, unique=True)
 	url = models.CharField(max_length=255, blank=True)
+	def __unicode__(self):
+		try:
+			return str('{0}: {1}'.format(self.name,self.category.name)).decode().encode('utf-8')
+		except Exception as e:
+			print "Can't be displayed"
 
 
 class ArticleCategory(models.Model):
 	name = models.CharField(max_length=255, unique=True)
+	def __unicode__(self):
+		try:
+			return str('{0}'.format(self.name)).decode().encode('utf-8')
+		except Exception as e:
+			print "Can't be displayed"
 
 
 class Article(models.Model):
@@ -47,17 +62,33 @@ class Article(models.Model):
 	brand = models.ForeignKey(Brand, null=True, blank=True)
 	name = models.CharField(max_length=255, unique=True)
 	url = models.CharField(max_length=255, blank=True)
+	def __unicode__(self):
+		try:
+			return str('{0}: {1}: {2}'.format(self.brand.name, self.name,self.category.name)).decode().encode('utf-8')
+		except Exception as e:
+			print "Can't be displayed"
+
 
 
 class Store(models.Model):
 	name = models.CharField(max_length=255, unique=True)
 	url = models.CharField(max_length=255, blank=True)
+	def __unicode__(self):
+		try:
+			return str('{0}'.format(self.name)).decode().encode('utf-8')
+		except Exception as e:
+			print "Can't be displayed"
 
 
 class ArticlePrice(models.Model):
 	article = models.ForeignKey(Article)
 	price = models.FloatField()
 	store = models.ForeignKey(Store, null=True, blank=True)
+	def __unicode__(self):
+		try:
+			return str('{0}: {1}: {2}'.format(self.article.name, self.price,self.store.name)).decode().encode('utf-8')
+		except Exception as e:
+			print "Can't be displayed"
 
 
 class PictureArticleTag(models.Model):
@@ -67,3 +98,8 @@ class PictureArticleTag(models.Model):
 	y_coordinate = models.IntegerField(unique=True, null=True, blank=True)
 	created = models.DateTimeField(auto_now_add=True)
 	modified = models.DateTimeField(auto_now=True)
+	def __unicode__(self):
+		try:
+			return str('{0}: {1}: {2}'.format(self.picture.owner.username, self.picture.picture_id, self.article.name)).decode().encode('utf-8')
+		except Exception as e:
+			print "Can't be displayed"

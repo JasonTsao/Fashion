@@ -123,3 +123,151 @@ def connectInstagram(request):
 	redirect_url = REQUEST_TOKEN_URL + '?client_id=%s&redirect_uri=%s&response_type=code&scope=likes+comments+relationships' % (CLIENT_ID, urllib.quote_plus(callback_url))
 
 	return HttpResponseRedirect(redirect_url)
+
+
+def getProfilePicture(request):
+	pf_pic = False
+	try:
+		account = Account.objects.get(user=request.user)
+		pf_pic = account.profile_picture
+	except:
+		pass
+	return pf_pic
+
+
+def updateUserSocialData(ig_profile):
+	try:
+		account = Account.objects.get(ig_id=ig_profile['id'])
+		account.profile_picture = ig_profile['profile_picture']
+		account.posts = ig_profile['counts']['media']
+		account.followers = ig_profile['counts']['followed_by']
+		account.follows = ig_profile['counts']['follows']
+		account.description = ig_profile['bio']
+		account.save()
+	except Exception as e:
+		print 'Unable to update instagram user profile picture: {0}'.format(e)
+
+
+@login_required
+def checkIGUserRelationship(request):
+	rtn_dict = {'success':False, 'msg': ''}
+	try:
+		ig_id = request.GET.get('ig_id', False)
+
+		if ig_id:
+			account = Account.objects.get(user=request.user)
+			relationship = getIGUserRelationship(ig_id, account.access_token)
+			rtn_dict['success'] = True
+			rtn_dict['relationship'] = relationship
+			rtn_dict['msg'] = 'Successfully checked relationship with user: {0}'.format(ig_id)
+		else:
+			rtn_dict['msg'] = 'No ig id in GET request parameters'
+	except Exception as e:
+		rtn_dict['msg'] = 'Unable to get IG user relationship: {0}'.format(e)
+	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
+
+
+@login_required
+def followIGUser(request):
+	rtn_dict = {'success':False, 'msg': ''}
+	try:
+		ig_id = request.POST.get('ig_id', False)
+		action = request.POST.get('action', False)
+
+		if ig_id and action:
+			account = Account.objects.get(user=request.user)
+			follows = followUser(ig_id, account.access_token, action)
+			rtn_dict['success'] = True
+			rtn_dict['msg'] = 'Successfully followed user with id: {0}'.format(ig_id)
+		else:
+			rtn_dict['msg'] = 'No ig id in GET request parameters'
+	except Exception as e:
+		rtn_dict['msg'] = 'Unable to get list of users that you follow: {0}'.format(e)
+	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
+
+
+@login_required
+def getUserFollowing(request):
+	rtn_dict = {'success':False, 'msg': ''}
+	try:
+		account = Account.objects.get(user=request.user)
+		response = getAllFollowing(account.ig_id, account.access_token)
+		follows = response['data']
+		rtn_dict['follows'] = follows
+		rtn_dict['pagination'] = response['pagination']
+		rtn_dict['follows_count'] = len(follows)
+	except Exception as e:
+		rtn_dict['msg'] = 'Unable to get list of users that you follow: {0}'.format(e)
+	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
+
+
+@login_required
+def getIGUserInfo(request):
+	rtn_dict = {'success':False, 'msg': ''}
+	try:
+		ig_id = request.GET.get('ig_id', False)
+
+		if ig_id:
+			account = Account.objects.get(user=request.user)
+			ig_profile = getIGUserData(ig_id, account.access_token)
+
+			updateUserSocialData(ig_profile)
+			rtn_dict['ig_profile'] = ig_profile
+			rtn_dict['success'] = True
+		else:
+			rtn_dict['msg'] = 'No ig id in GET request parameters'
+	except Exception as e:
+		rtn_dict['msg'] = 'Unable to get list of users that you follow: {0}'.format(e)
+	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
+
+
+@login_required
+def getIGUserFollowing(request):
+	rtn_dict = {'success':False, 'msg': ''}
+	try:
+		ig_user_id = request.GET.get('ig_id', False)
+
+		if ig_user_id:
+			account = Account.objects.get(user=request.user)
+			follows = getAllFollowing(ig_user_id, account.access_token)
+			rtn_dict['follows'] = follows
+			rtn_dict['follows_count'] = len(follows)
+	except Exception as e:
+		rtn_dict['msg'] = 'Unable to get list of users that you follow: {0}'.format(e)
+	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
+
+
+@login_required
+def searchIGUsersByName(request):
+	rtn_dict = {'success':False, 'msg': ''}
+
+	try:
+		search_name = request.POST['search_name']
+
+		account = Account.objects.get(user=request.user)
+		ig_users = searchUsersByName(search_name, account.access_token)
+
+		rtn_dict['ig_users'] = ig_users
+		rtn_dict['ig_users_count'] = len(ig_users)
+	except Exception as e:
+		rtn_dict['msg'] = 'Unable to get list of users that you follow: {0}'.format(e)
+	return HttpResponse(json.dumps(rtn_dict), content_type="application/json")
+
+
+@login_required
+def getUserPosts(request):
+	rtn_dict = {'success':False, 'msg': ''}
+	try:
+		user_id = request.POST['user_id']
+		post_filter = request.POST['post_filter']
+		account = Account.objects.get(user=request.user)
+		response = getIGUserPosts(user_id, account.access_token, post_filter)
+		posts = response['data']
+
+		rtn_dict['posts'] = posts
+		rtn_dict['pagination'] = response['pagination']
+		rtn_dict['posts_count'] = len(posts);
+		rtn_dict['success'] = True;
+	except Exception as e:
+		rtn_dict['msg'] = 'Unable to get posts from user {0}: {1}'.format(user_id, e)
+	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
