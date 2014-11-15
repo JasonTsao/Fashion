@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include('auth.urls')),
     url(r'^instagram_api/', include('instagram.urls')),
+    url(r'^discover/', include('discovery.urls')),
     # url(r'^$', 'Fashion.views.home', name='home'),
     # url(r'^Fashion/', include('Fashion.foo.urls')),
 
