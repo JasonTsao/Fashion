@@ -9,6 +9,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^accounts/', include('auth.urls')),
+    url(r'^instagram_api/', include('instagram.urls')),
     # url(r'^$', 'Fashion.views.home', name='home'),
     # url(r'^Fashion/', include('Fashion.foo.urls')),
 
