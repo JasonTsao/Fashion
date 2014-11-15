@@ -65,20 +65,25 @@ def OAuth(request):
 		conn = urllib2.urlopen(REQUEST_ACCESS_TOKEN, data=data)
 		try:
 			response = json.loads(conn.read())
+			print response
 			try:
 				user = None
 				if len(Account.objects.filter(ig_id=response["user"]["id"])) < 1:
-					user = User.objects.create_user(username=response["user"]["id"],
+					user = User.objects.create_user(username=response["user"]["username"],
 													password=response["user"]["id"])
 				else:
 					account = Account.objects.get(ig_id=response["user"]["id"])
 					user = account.user
 				account, created = Account.objects.get_or_create(user=user, ig_id=response["user"]["id"])
 				#if created:
+				account.username = response['user']['username']
 				account.profile_picture = response['user']['profile_picture']
 				account.access_token = response["access_token"]
+				account.fullname = response['user']['full_name']
+				account.description = response['user']['bio']
+				account.web_page = response['user']['website']
 				account.save()
-				user = authenticate(username=account.ig_id, password=account.ig_id)
+				user = authenticate(username=account.username, password=account.ig_id)
 				if user is not None:
 					user.backend = 'django.contrib.auth.backends.ModelBackend'
 					user.save()
@@ -87,7 +92,8 @@ def OAuth(request):
 					if next:
 						return redirect(next)
 					else:
-						return redirect("dashboard.views.dashboard")
+						pass
+						#return redirect("dashboard.views.dashboard")
 					rtn_dict['msg'] = 'Successfully got instagram acess_token'
 					rtn_dict['success'] = True
 			except Exception as e:
