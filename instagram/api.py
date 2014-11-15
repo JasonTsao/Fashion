@@ -1,5 +1,7 @@
 import oauth2 as oauth
 import httplib2
+import urllib
+import urllib2
 
 import json
 import ast
@@ -24,8 +26,8 @@ NUM_SEARCH_RESULTS_X_20 = 50
 REQUEST_TOKEN_URL = "https://api.instagram.com/oauth/authorize/"
 REQUEST_ACCESS_TOKEN = "https://api.instagram.com/oauth/access_token"
 
-CLIENT_ID = '397277615fa64099af9ea070fa4d63f2'
-CLIENT_SECRET = '36c112a874074b50bf0703621ed6075f'
+CLIENT_ID = '6d7322fc939a4d348dc0cdb1b1b122a8'
+CLIENT_SECRET = '48dcf0fcb59f44cabb2a868b647966e8'
 
 
 @csrf_exempt
@@ -44,7 +46,7 @@ def OAuth(request):
 	code = request.GET.get('code')
 	next = request.GET.get('next', False)
 
-	redirect_uri = 'http://' + request.META['HTTP_HOST'] + '/app/oauth'
+	redirect_uri = 'http://' + request.META['HTTP_HOST'] + '/instagram_api/oauth'
 
 	if next:
 		redirect_uri += '?next=' + next
@@ -106,7 +108,7 @@ def connectInstagram(request):
 	'''
 		Connect to instagram to start process of getting access token
 	'''
-	callback_url = 'http://{0}/app/oauth'.format(request.META["HTTP_HOST"])
+	callback_url = 'http://{0}/instagram_api/oauth'.format(request.META["HTTP_HOST"])
 	next = request.GET.get('next', False)
 
 	if next:
