@@ -28,3 +28,8 @@ def paginatedGlobalImages(request):
 	except Exception, e:
 		rtn_dict["error"] = "{}".format(e)
 	return HttpResponse(json.dumps(rtn_dict), "application/json")
+
+
+def paginatedRegionalImages(request):
+	rtn_dict = {"success": False}
+	return HttpResponse(json.dumps(rtn_dict), "application/json")
