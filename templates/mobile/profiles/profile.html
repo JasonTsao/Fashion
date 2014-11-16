@@ -10,7 +10,7 @@
 <meta property="og:site_name" content="IGHottest"/>
 <meta property="fb:admins" content="USER_ID"/>
 <meta property="og:description"
-      content="Check out {{ig_user.name}}'s hottest pictures!"/>
+      content="Check out {{ig_user.username}}'s hottest pictures!"/>
 <link rel="stylesheet" href="{% static 'css/profiles/profiles.css' %}">
 {% endblock %}
 
@@ -22,7 +22,7 @@
 	            <img src="{{ig_user.profile_picture}}"></img>
 	        </div>
 	        <div class="profile-username-container">
-	            <h5>{{ig_user.name}}</h5>
+	            <h5>{{ig_user.username}}</h5>
 	        </div>
 	    </div>
 	    <div class="swiper-container profile-swiper-container" id="swiper-container-{{ig_user.ig_id}}">
@@ -75,20 +75,8 @@
 		    </div>
 	    </div>
 
-	    <div id="profile-tags-container">
-	        {% for k, v in tags.items %}
-	            <div class="profile-tag-category-container" id="profile-tag-category-{{k}}" name="{{k}}">
-	                {% for category_item in v %}
-	                    <input type="checkbox" class="radio" id="profile-tag-{{k}}-{{category_item.name}}" name="{{k}}" value="{{category_item.id}}"/>
-	                    <label class="profile-category-tag-button" for="profile-tag-{{k}}-{{category_item.name}}">{{category_item.name}}</label>
-	                {% endfor %}
-	            </div>
-	        {% endfor %}
-	    </div>
-        <div class="social-share-container profile-social-container">
+        <!--<div class="social-share-container profile-social-container">
             <div class="social-share-container-item facebook-share-item" onclick="fbShare('http://ighottest.com{{request.get_full_path}}')">
-                <!--<div class="fb-share-button" data-href="{{request.get_full_path }}" data-width="80"></div>-->
-                <!--<div class="fb-share-button" data-href="http://ighottest.com{{request.get_full_path}}" data-layout="icon" data-width="100"></div>-->
                 <img src="http://img2.wikia.nocookie.net/__cb20130501121248/logopedia/images/f/fb/Facebook_icon_2013.svg"></img>
             </div>
             <div class="social-share-container-item twitter-share-item" onclick="twitterShare('http://ighottest.com{{request.get_full_path}}', '{{ig_user.name}}')">
@@ -101,95 +89,7 @@
             <div class="social-share-container-item gplus-share-item" onclick="googlePlusShare('http://ighottest.com{{request.get_full_path}}')">
                 <img src="http://snd1.org/wp-content/uploads/2014/04/Google-Plus-icon.png"></img>
             </div>
-        </div>
-
-        {% if competitions%}
-        <div class="profile-page-wide-button" onclick="toggleBattleStats()">
-            <h5>Battle Stats</h5>
-        </div>
-
-        <div id="battle-stats-container" >
-            <ul id="battle-stats-list">
-            {% for competition in competitions%}
-                <li class="battle-list-li">
-                    <div class="battle-list-item-container" id="battle-{{competition.id}}">
-                        {% if user.is_authenticated%}
-                        <div class="battle-title-container" onclick="battlePage({{competition.id}})">
-                        {% else %}
-                        <div class="battle-title-container" onclick="loginProcess({% url 'competitions.views.allBattles' %}, 'battle', '{{competition.id}}')">
-                        {% endif %}
-                            <div class="battle-title-ranking-container">
-                                <h5></h5>
-                            </div>
-                            <div class="battle-title-text">
-                                <h5>{{competition.name}}</h5>
-                            </div>
-                        </div>
-
-                        <div class="battle-win-lose-container">
-                            <div class="battle-win-button toggle-selected" id="wins-button-{{competition.id}}" onclick="toggleBattleWin({{competition.id}})">
-                                <div class="battle-win-loss-text">
-                                    <h5>Wins</h5>
-                                </div>
-                                <div class="battle-win-loss-text" id="battle-win-number-{{competition.id}}">
-                                    <h5>{{competition.total_wins}}</h5>
-                                </div>
-                            </div>
-                            <div class="battle-lose-button" id="losses-button-{{competition.id}}" onclick="toggleBattleLosses({{competition.id}})">
-                                <div class="battle-win-loss-text">
-                                    <h5>Losses</h5>
-                                </div>
-                                <div class="battle-win-loss-text" id="battle-loss-number-{{competition.id}}">
-                                    <h5>{{competition.total_losses}}</h5>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="verses-win-stats-container" id="wins-against-{{competition.id}}">
-                            <ul class="verses-stats-list">
-                                {% for profile in competition.wins %}
-                                    <li class="verses-stats-li" onclick="goToProfile({{profile.ig_id}})">
-                                        <div class="verses-stats-item-container">
-                                            <div class='verses-stats-profile-picture'>
-                                                <img src="{{profile.profile_picture}}"></img>
-                                            </div>
-                                            <div class='verses-stats-profile-name'>
-                                                <h5>{{profile.name}}</h5>
-                                            </div>
-                                            <div class='verses-stats-count'>
-                                                <h5>{{profile.count}}</h5>
-                                            </div>
-                                        </div>
-                                    </li>
-                                {%endfor%}
-                            </ul>
-                        </div>
-
-                        <div class="verses-loss-stats-container" id="losses-against-{{competition.id}}">
-                            <ul class="verses-stats-list">
-                                {% for profile in competition.losses%}
-                                    <li class="verses-stats-li" onclick="goToProfile({{profile.ig_id}})">
-                                        <div class="verses-stats-item-container">
-                                            <div class='verses-stats-profile-picture'>
-                                                <img src="{{profile.profile_picture}}"></img>
-                                            </div>
-                                            <div class='verses-stats-profile-name'>
-                                                <h5>{{profile.name}}</h5>
-                                            </div>
-                                            <div class='verses-stats-count'>
-                                                <h5>{{profile.count}}</h5>
-                                            </div>
-                                        </div>
-                                    </li>
-                                {%endfor%}
-                            </ul>
-                        </div>
-                    </div>
-                </li>
-            {% endfor%}
-            </ul>
-        </div>
-        {% endif %}
+        </div>-->
 
 	   	<div id="user-submitted-pictures">
 	   		<div id="user-submitted-title-container">
@@ -199,16 +99,6 @@
 	   			<ul id="user-submitted-pictures-ul">
 	   			</ul>
 	   		</div>
-
-            {% if user.is_authenticated%}
-            <div class="profile-page-wide-button" onclick="goToUserSubmissionPage('{{ig_user.ig_id}}', '{{ig_user.name}}')">
-                <h5>Know More?</h5>
-            </div>
-            {% else%}
-            <div class="profile-page-wide-button not-logged-in-button">
-                <h5>Know More?</h5>
-            </div>
-            {% endif %}
 	   	</div>
 	</div>
 </div>

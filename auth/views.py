@@ -90,4 +90,4 @@ def login_func(request):
         form = AuthenticationForm()
 
     #return render_to_response("registration/login.html", {'a_form': form, 'next': nextPage, 'state': state}, context_instance=RequestContext(request))
-    return redirect("ig.api.connectInstagram")
+    return redirect("instagram.api.connectInstagram")

@@ -55,14 +55,14 @@
 					{% if user.is_authenticated %}
 						<li><a onclick="battlePage()">Battle Mode</a></li>
 					{% else %}
-						<li><a onclick="loginProcess('{% url 'competitions.views.allBattles' %}')">Battle Mode</a></li>
+						<li><a onclick="loginProcess('')">Battle Mode</a></li>
 					{% endif %}
 					<li><a onclick="discoveryPage()">Discovery</a></li>
 					{% if user.is_authenticated %}
 					<li><a onclick="recommendationsPage()">Submit</a></li>
 					<li><a onclick="logout()">Logout</a></li>
 					{% else %}
-					<li><a onclick="loginProcess('{% url 'ig.views.userSubmitProfile' %}')">Submit</a></li>
+					<li><a onclick="loginProcess('')">Submit</a></li>
 					{% endif %}
 				</ul>
 			</nav>

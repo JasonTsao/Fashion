@@ -1,0 +1,402 @@
+#profile-container{
+	width: 100%;
+	margin: 0px auto;
+	background-color: #fff;
+	position: relative;
+}
+
+#profiles-list{
+	list-style-type:none;
+	padding: 0;
+	overflow:hidden;
+}
+
+.profile-a{
+	text-decoration:none;
+}
+
+.profile-a:hover{
+	text-decoration:none;
+}
+
+.profile-li{
+	width:100%;
+	cursor:pointer;
+}
+
+.profile-page-header{
+	margin-top:52px;
+}
+
+.header-profile-container{
+	width:50px;
+	height:50px;
+	float:right;
+}
+
+.profile-header-container{
+	width:100%;
+	height:50px;
+	padding:5px;
+}
+
+.profile-picture-container{
+	width:40px;
+	float:left;
+}
+
+.profile-picture-container img{
+	height:40px;
+	width:40px;
+	border-radius:100px;
+}
+
+.profile-username-container{
+	width:25%;
+	float:left;
+}
+
+.profile-username-container h5{
+	padding-left:10px;
+}
+
+.profile-submitted-count-container{
+	text-align:center;
+	float:right;
+	padding-top:8px;
+}
+.profile-submitted-count-container h5{
+	padding-right:10px;
+	margin:0px;
+	font-size:75%;
+}
+
+.profile-swiper-container{
+}
+
+.profile-info-container{
+	width:100%;
+	margin:0px auto;
+}
+
+.profile-social-container{
+	width:100%;
+}
+
+.profile-bio-container{
+	width:100%;
+	overflow:hidden;
+	font-size:75%;
+	padding:10px;
+}
+
+.profile-social-button{
+	width:25%;
+	height:100%;
+	float:left;
+	overflow:hidden;
+}
+
+.profile-social-button:hover{
+	cursor:pointer;
+}
+
+.profile-follow-button-container{
+	width:25%;
+	height:100%;
+	float:left;
+	overflow:hidden;
+	border-radius:5px;
+	text-align:center;
+	background-color:#FF46AA;
+	color:#fff;
+}
+
+.profile-unfollow-button-container{
+	width:25%;
+	height:100%;
+	float:left;
+	overflow:hidden;
+	border-radius:5px;
+	background-color:#04E2F0;
+	text-align:center;
+	color:#fff;
+}
+
+.profile-unfollow-button-container h2{
+	padding-top:12px;
+}
+
+.profile-a{
+	text-decoration:none;
+}
+
+.profile-a:hover{
+	text-decoration:none;
+}
+
+.profile-social-number{
+	text-align:center;
+	margin-top:5px;
+	margin-bottom:0px;
+	color:#333;
+	font-size:75%;
+}
+
+.profile-social-text{
+	text-align:center;
+	color:#5C5C5C;
+	margin-top: 0px;
+	font-size:75%;
+}
+
+.profile-username{
+	color:#333;
+	text-decoration: none;
+}
+
+.profile-username:hover{
+	color:#333;
+	text-decoration: none;
+}
+
+.profile-bio-text{
+	display:inline;
+	color:#333;
+	text-decoration: none;
+}
+
+.profile-bio-text:hover{
+	display:inline;
+	color:#333;
+	text-decoration: none;
+}
+.profile-pagination{
+	position:relative;
+	z-index:20;
+	text-align:center;
+}
+
+.collection-carousel-display {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#profile-tags-container{
+	display:inline-block;
+	width:100%;
+	min-height:50px;
+}
+
+#user-submitted-pictures{
+	width:100%;
+}
+
+#user-submitted-title-container{
+	width:100%;
+	background-color:#2c2c2c;
+	color:#fff;
+	text-align:center;
+	height:35px;
+}
+
+#user-submitted-title-container h5{
+	margin:0px;
+	padding-top:9px;
+}
+
+#user-submitted-pictures-ul{
+	list-style:none;
+	padding-left:0px;
+	margin-bottom:0px;
+	width:100%;
+	display:inline-block;
+}
+
+.user-picture-item{
+	float:left;
+	width:33%;
+	padding-left:1px;
+	padding-right:1px;
+	padding-bottom:1px;
+}
+
+.user-picture-item img{
+	width:100%;
+}
+
+.profile-tag-category-container{
+	width:25%;
+	height:100%;
+	float: left;
+}
+
+#profile-tags-container{
+	width:100%;
+}
+
+.ui-checkbox .ui-btn{
+	font-size:10px;
+}
+
+.picture-img-container{
+	width:100%;
+	display:inline-block;
+}
+
+.picture-img-container img{
+	width:100%;
+}
+
+#user-picture-vote-container{
+	width:100%;
+	display:inline-block;
+}
+
+.picture-vote-button-vote{
+	width:50%;
+	float:left;
+	height:100%;
+	overflow:hidden;
+	text-align:center;
+	border-radius:5px;
+	background-color:#FF46AA;
+	color:#fff;
+}
+
+.picture-vote-button-voted{
+	width:50%;
+	float:left;
+	height:100%;
+	overflow:hidden;
+	text-align:center;
+	background-color:#04E2F0;
+	border-radius:5px;
+	color:#fff;
+}
+
+#picture-number-of-votes-container{
+	float:left;
+	width:50%;
+}
+
+.profile-page-wide-button{
+	display:inline-block;
+	text-align:center;
+	width:100%;
+	border-radius:5px;
+	background-color:#FF46AA;
+	color:#fff;
+}
+
+#battle-stats-container{
+	display:none;
+	width:100%;
+	height:auto;
+}
+
+#battle-stats-list{
+	list-style:none;
+	padding-left:0px;
+}
+
+.battle-list-li{
+
+}
+
+.battle-title-container{
+	display:inline-block;
+	background-color:#2c2c2c;
+	color:#fff;
+	width:100%;
+	text-align:center;
+	padding-left:10px;
+}
+
+.battle-list-item-container{
+	width:100%;
+}
+
+.battle-title-text{
+	padding-left:10px;
+}
+
+.battle-title-ranking-container{
+	height:100%;
+	color:#fff;
+	border-radius:50px;
+}
+
+.battle-win-lose-container{
+	display:inline-block;
+	width:100%;
+	border-radius:5px;
+	border-width:1px;
+	border-style:solid;
+	border-color:#ddd;
+	text-shadow:0 1px 0 #f3f3f3;
+	color:#333;
+}
+
+.battle-win-button{
+	float:left;
+	width:50%;
+}
+
+.battle-lose-button{
+	float:left;
+	width:50%;
+}
+
+.battle-win-loss-text{
+	float:left;
+	margin-left:10px;
+}
+
+.verses-stats-list{
+	padding-left:0px;
+	list-style:none;
+}
+
+.verses-win-stats-container{
+	display:inline-block;
+	width:100%;
+}
+
+.verses-loss-stats-container{
+	display:none;
+	width:100%;
+}
+
+.verses-stats-item-container{
+	display:inline-block;
+	width:100%;
+	padding-left:10px;
+	padding-right:10px;
+}
+
+.verses-stats-count{
+	float:right;
+}
+
+.verses-stats-profile-picture{
+	float:left;
+}
+
+.verses-stats-profile-name{
+	float:left;
+	padding-left:10px;
+}
+
+
+.verses-stats-profile-picture img{
+	width:40px;
+	height:40px;
+	border-radius:40px;
+}
+
+.toggle-selected{
+	background-color: #FF46AA;
+	color: #fff;
+}
