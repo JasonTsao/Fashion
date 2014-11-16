@@ -27,9 +27,6 @@ def picturePage(request):
 	user_voted = False
 	page_name = False
 
-	print 'picture_id : {0}'.format(picture_id)
-	print 'ig_id: {0}'.format(ig_id)
-
 	if picture_id and ig_id:
 		try:
 			ig_model = Account.objects.get(ig_id=ig_id)
@@ -41,9 +38,6 @@ def picturePage(request):
 
 		except Exception as e:
 			print 'Unable to pull IG user profile: {0}'.format(e)
-
-	print 'picture'
-	print picture
 
 	pf_pic = getProfilePicture(request)
 

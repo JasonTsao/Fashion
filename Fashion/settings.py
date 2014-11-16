@@ -132,7 +132,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_mobile',
+    'django.contrib.humanize',
     'south',
     'accounts',
     'discovery',

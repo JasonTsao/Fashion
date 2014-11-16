@@ -11,7 +11,7 @@
 <meta property="fb:admins" content="USER_ID"/>
 <meta property="og:description"
       content="Check out {{ig_user.username}}'s hottest pictures!"/>
-<link rel="stylesheet" href="{% static 'css/profiles/profiles.css' %}">
+<link rel="stylesheet" href="{% static 'css/mobile/profiles/profiles.css' %}">
 {% endblock %}
 
 {% block bodyContent %}
@@ -117,13 +117,13 @@
         });
 
         function goToImagePage(ig_id, picture_id){
-            var url = "{% url 'modelProfile.views.picturePage'%}";
+            var url = "{% url 'pictures.views.picturePage'%}";
             url += '?ig_id=' + ig_id + '&picture_id=' + picture_id;
             window.location.href = url;
         }
 
         function goToProfile(ig_id){
-            var url = "{% url 'modelProfile.views.profilePage' %}";
+            var url = "{% url 'profiles.views.profilePage' %}";
             url += '?ig_id=' + ig_id;
             window.location.href = url;
         }
@@ -183,7 +183,7 @@
         }
 
         function goToUserSubmissionPage(ig_id, username){
-            var url = "{% url 'ig.views.userSubmitProfile' %}";
+            var url = "";
             url += '?ig_id=' + ig_id + '&username=' + username;
             window.location.href = url;
         }
@@ -202,7 +202,7 @@
         }
 
         function followUser(ig_id){
-            url = "{% url 'ig.api.followIGUser'%}";
+            url = "{% url 'instagram.api.followIGUser'%}";
             url = url + "?ig_id=" + ig_id;
             var follow_button = $('#follow-button-' + ig_id);
             var action = 'follow'
@@ -234,7 +234,7 @@
 
         function getIGUsersData(){
             var ig_id = "{{ig_user.ig_id}}";
-            getIGUserPictures(ig_id);
+            //getIGUserPictures(ig_id);
             {% if user.is_authenticated %}
                 getIGUserSocialData(ig_id);
                 getIGUserRelationship(ig_id);
@@ -242,7 +242,7 @@
         }
 
         function getIGUserRelationship(ig_id){
-            url = "{% url 'ig.api.checkIGUserRelationship' %}"
+            url = "{% url 'instagram.api.checkIGUserRelationship' %}"
             url = url + "?ig_id=" + ig_id;
             $.ajax({
                 type: "GET",
@@ -268,7 +268,7 @@
         }
 
         function getIGUserSocialData(ig_id){
-            url = "{% url 'ig.api.getIGUserInfo'%}";
+            url = "{% url 'instagram.api.getIGUserInfo'%}";
             url = url + "?ig_id=" + ig_id;
 
             $.ajax({
@@ -399,7 +399,7 @@
             IsValidSubmittdImageUrl(picture['standard_resolution'],validSubmittedImageCallback, picture_id_str);
 
             li.click(function(){
-                var url = "{% url 'modelProfile.views.picturePage' %}";
+                var url = "{% url 'pictures.views.picturePage' %}";
                 url += "?picture_id=" + $(this).attr('id') + '&ig_id=' + ig_id;
                 window.location.href = url;
             })
@@ -410,7 +410,7 @@
 
         function getUserSubmittedPictures(ig_id){
         	var ig_profiles_list = $('#user-submitted-pictures-ul');
-        	var url = "{% url 'modelProfile.api.getUserSubmittedPicturesForProfile' %}";
+        	var url = "{% url 'pictures.api.getUserPictures' %}";
         	url += '?ig_id=' + ig_id;
 
             $.ajax({
@@ -432,7 +432,7 @@
 
 
         function getIGUserPictures(ig_id){
-            var url = "{% url 'modelProfile.api.getIGModelCuratorSelectedImages' %}";
+            var url = "modelProfile.api.getIGModelCuratorSelectedImages";
             url = url + "?ig_id=" + ig_id;
 
             $.ajax({

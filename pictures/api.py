@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.forms.models import model_to_dict
 
 from models import Article, PictureArticleTag, Picture
+from accounts.models import Account
 
 import json
 
@@ -93,7 +94,7 @@ def getUserPictures(request):
 				user_pics = Picture.objects.filter(owner=account)
 				# assemble counts of user submitted pictures
 				for user_pic in user_pics:
-					user_pictures_dict[user_pic.img_id] = {}
+					user_pictures_dict[user_pic.picture_id] = {}
 					user_pictures_location = {
 						'location_id': user_pic.location_id,
 						'location_name': user_pic.location_name,
@@ -101,12 +102,12 @@ def getUserPictures(request):
 						'longitude': user_pic.longitude,
 					}
 
-					user_pictures_dict[user_pic.img_id]['id'] = user_pic.img_id
-					user_pictures_dict[user_pic.img_id]['src'] = user_pic.url
-					user_pictures_dict[user_pic.img_id]['standard_resolution'] = user_pic.standard_resolution_url
-					user_pictures_dict[user_pic.img_id]['low_resolution'] = user_pic.low_resolution_url
-					user_pictures_dict[user_pic.img_id]['ig_link'] = user_pic.ig_link
-					user_pictures_dict[user_pic.img_id]['location'] = user_pictures_location
+					user_pictures_dict[user_pic.picture_id]['id'] = user_pic.picture_id
+					user_pictures_dict[user_pic.picture_id]['src'] = user_pic.thumbnail_url
+					user_pictures_dict[user_pic.picture_id]['standard_resolution'] = user_pic.standard_resolution_url
+					user_pictures_dict[user_pic.picture_id]['low_resolution'] = user_pic.low_resolution_url
+					user_pictures_dict[user_pic.picture_id]['ig_link'] = user_pic.ig_link
+					user_pictures_dict[user_pic.picture_id]['location'] = user_pictures_location
 			except Exception as e:
 				print 'Unable to pull user photos: {0}'.format(e)
 
