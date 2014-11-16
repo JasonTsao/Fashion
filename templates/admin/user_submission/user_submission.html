@@ -1,0 +1,484 @@
+<!doctype html>
+{% load staticfiles %}
+<html>
+<head>
+    <!--<link rel="stylesheet" href="{% static 'css/admin/user_submission/user_submission.css' %}">-->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <style>
+        #user-pics{
+            max-height:804px;
+            overflow:scroll;
+        }
+    </style>
+    <script type="text/javascript">
+
+        function setPostsScroll(){
+            $('#user-pics').scroll(function(){
+                if($(this).scrollTop() + $(this).height() >= this.scrollHeight) {
+                    $.ajax({
+                        type: "GET",
+                        dataType: "jsonp",
+                        url: $('.ig-pagination-posts').attr('id'),
+                        success: function(data) {
+                            if(data.pagination['next_url']){
+                                $('.ig-pagination-posts').attr('id', data.pagination['next_url']);
+                                for (picture_index in data.data){
+                                    appendPostToList(data.data[picture_index]);
+                                }
+                            }
+                            else{
+                                //unbind scroll
+                                $('#user-pics').unbind('scroll');
+                            }
+                        },
+                        error: function(data) {
+                            console.log(data);
+                        }
+                    });
+                }
+            })
+        }
+
+        function searchIGUsers(){
+            var user_name = $('#ig-user-searchfield').val();
+            var searched_users_list = $('#searched-users-list');
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'instagram.api.searchIGUsersByName' %}",
+                data: {'search_name': user_name,
+                       'csrfmiddlewaretoken': "{{csrf_token}}"},
+                success: function(data) {
+                    searched_users_list.empty();
+                    for (user_index in data.ig_users){
+                        var li = $('<li/>');
+                        var user_image = $('<img/>');
+                        var user_name = $('<h5/>');
+                        var username_div = $('<div/>');
+                        //var user_description = $('<div/>');
+
+                        searched_user = data.ig_users[user_index];
+
+                        li.attr('id', searched_user['id']);
+                        li.css({'float':'left'});
+                        li.addClass('user-profiles-list-item');
+
+                        //adding hover over functionality : NOT WORKING
+                        li.hover(function(){
+                            $(this).attr('opacity', 0.5);
+                            $(this).attr('cursor', 'pointer');
+                        }, function(){
+                            $(this).attr('opacity', 1);
+                            $(this).attr('cursor', 'auto');
+                        });
+
+                        //user_description.html(searched_user['bio']);
+                        //li.append(user_description)
+                        username_div.attr('id', searched_user['username']);
+                        li.append(username_div);
+                        //put the users name
+                        user_name.html(searched_user['full_name']);
+                        li.append(user_name);
+
+                        //set users profile picture
+                        user_image.attr('src', searched_user['profile_picture'])
+                        li.append(user_image);
+
+                        li.click(function(){
+                            user_id = $(this).attr('id');
+                            $('.selected-user-id-container').attr('id', user_id);
+                            $('.selected-user-name-container').attr('id', $(this).children('div').attr('id'));
+
+                            // check if user already exists in our database
+                            var url = "{% url 'profiles.api.checkIfUserInDatabase'%}";
+                            url += '?ig_id=' + user_id;
+                            $.ajax({
+                                type: "GET",
+                                url: url,
+                                success: function(data) {
+                                    console.log(data)
+                                    if(data.exists){
+                                        console.log('ig user already exists in DB')
+                                    }
+                                    else{
+                                        console.log(data.ig_id);
+                                        selectUserAndDisplayPictures(data.ig_id);
+                                    }
+                                },
+                                error: function(data) {
+                                    console.log(data);
+                                }
+                            });
+                            
+                        });
+
+                        searched_users_list.append(li);
+                    }
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function appendPostToList(picture){
+            var post_filter = 'all';
+            var user_pictures_list = $('#user-pics-list');
+
+            var li = $('<li/>');
+            var image = $('<img/>');
+            //var picture = data.posts[picture_index];
+            var location_data = picture['location'];
+                            
+            li.attr('id', picture['id']);
+            li.addClass('user-picture-item');
+
+            li.css({'float':'left'});
+
+            for (location_index in location_data){
+                var location_div = $('<div/>')
+                location_div.attr('id', location_index);
+                location_div.html(location_data[location_index]);
+                location_div.css({'display':'none'});
+                li.append(location_div);
+            }
+
+            //set users profile picture
+            image.attr('src', picture['images']['thumbnail']['url'])
+            //image.css({'width':'100%', 'height':'100%'});
+            li.append(image);
+
+            //add information about other resolution pictures
+            var standard_resolution = $('<h3 id="standard_resolution" style="display:none;"/>');
+            var low_resolution = $('<h3 id="low_resolution" style="display:none;"/>');
+            var ig_link = $('<h3 id="ig_link" style="display:none;"/>');
+            standard_resolution.html(picture['images']['standard_resolution']['url']);
+            low_resolution.html(picture['images']['low_resolution']['url']);
+            ig_link.html(picture['link']);
+            li.append(standard_resolution);
+            li.append(low_resolution);
+            li.append(ig_link);
+
+            li.click(function(){
+                user_id = $(this).attr('id');
+                img_url = $(this).children('img').attr('src');
+                selectPictureAndAddToList(user_id, img_url);
+            });
+
+            user_pictures_list.append(li);
+        }
+
+        function selectUserAndDisplayPictures(user_id){
+            var post_filter = 'all';
+            var user_pictures_list = $('#user-pics-list');
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'instagram.api.getUserPosts' %}",
+                data: {'user_id': user_id,
+                       'post_filter': post_filter,
+                       'csrfmiddlewaretoken': "{{csrf_token}}"},
+                success: function(data) {
+                    user_pictures_list.empty();
+                    $('.ig-pagination-posts').attr('id', data.pagination['next_url']);
+                    setPostsScroll();
+
+                    for (picture_index in data.posts){
+                        appendPostToList(data.posts[picture_index]);
+                        /*var li = $('<li/>');
+                        var image = $('<img/>');
+                        var picture = data.posts[picture_index];
+                        var location_data = picture['location'];
+                        
+                        li.attr('id', picture['id']);
+                        li.css({'float':'left'});
+                        li.addClass('user-picture-item');
+
+                        for (location_index in location_data){
+                            var location_div = $('<div/>')
+                            location_div.attr('id', location_index);
+                            location_div.html(location_data[location_index]);
+                            location_div.css({'display':'none'});
+                            li.append(location_div);
+                        }
+
+                        //adding hover over functionality : NOT WORKING
+                        li.hover(function(){
+                            $(this).attr('opacity', 0.5);
+                            $(this).attr('cursor', 'pointer');
+                        }, function(){
+                            $(this).attr('opacity', 1);
+                            $(this).attr('cursor', 'auto');
+                        });
+
+                        //set users profile picture
+                        image.attr('src', picture['images']['thumbnail']['url'])
+                        li.append(image);
+
+                        //add information about other resolution pictures
+                        var standard_resolution = $('<h3 id="standard_resolution" style="display:none;"/>');
+                        var low_resolution = $('<h3 id="low_resolution" style="display:none;"/>');
+                        var ig_link = $('<h3 id="ig_link" style="display:none;"/>');
+                        standard_resolution.html(picture['images']['standard_resolution']['url']);
+                        low_resolution.html(picture['images']['low_resolution']['url']);
+                        ig_link.html(picture['link']);
+                        li.append(standard_resolution);
+                        li.append(low_resolution);
+                        li.append(ig_link);
+
+                        li.click(function(){
+                            user_id = $(this).attr('id');
+                            img_url = $(this).children('img').attr('src');
+                            selectPictureAndAddToList(user_id, img_url);
+                        });
+
+                        user_pictures_list.append(li);*/
+                    }
+                },
+                 error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function pictureExistsInList(img_id){
+            var selected_pics = $('#selected-user-pics');
+            var pic_id = '#selected_' + img_id;
+            picture_object = $(pic_id);
+
+            if (picture_object.length > 0){
+                return true;
+            }
+            else{
+                return false;
+            }
+            return false;
+        }
+
+        function removePictureFromList(img_id){
+            var selected_pics = $('#selected-user-pics');
+            var pic_id = '#selected_' + img_id;
+            picture_object = $(pic_id).remove();
+        }
+
+        function selectPictureAndAddToList(img_id, img_url){
+            var selected_pics = $('#selected-user-pics-list');
+            var selected_picture = $('<li/>');
+            var original_image_id = '#' + img_id;
+            var original_picture = $(original_image_id);
+            var image = $('<img/>');
+
+            if (!pictureExistsInList(img_id)){
+                selected_id = 'selected_' + img_id;
+                selected_picture.attr('id', selected_id);
+                selected_picture.css({'float':'left'});
+
+                image.attr('src', img_url)
+                selected_picture.append(image);
+
+                selected_picture.click(function(){
+                    removePictureFromList(img_id);
+                });
+
+                var location_data = original_picture.children('div');
+                var img_data = original_picture.children('h3');
+
+                selected_picture.append(location_data.clone());
+                selected_picture.append(img_data.clone());
+
+                selected_pics.append(selected_picture);
+            }
+            else{
+                removePictureFromList(img_id)
+            }
+        }
+
+        function categoryExistsInList(category_name){
+            var selected_pics = $('#profile-categories-list');
+            var category_id = '#' + category_name;
+            var category_object = $(category_id);
+
+            if (category_object.length > 0){
+                return true;
+            }
+            else{
+                return false;
+            }
+            return false;
+        }
+
+        function removeCategoryFromList(category_name){
+            var selected_pics = $('#profile-categories-list');
+            var category_id = '#' + category_name;
+            $(category_id).remove();
+        }
+
+        function addCategoryTag(){
+            var selected_category_list = $('#profile-categories-list');
+            var selected_category = $('#profile-categories-choices').children(':selected').val(); 
+            
+            if(!categoryExistsInList(selected_category)){
+                var category_object = $('<li/>');
+                var category_name = $('<h5/>');
+
+                category_object.attr('id', selected_category);
+
+                category_name.html(selected_category);
+                category_object.append(category_name);
+
+                category_object.click(function(){
+                    removeCategoryFromList(selected_category);
+                });
+                selected_category_list.append(category_object)
+            }
+            else{
+                removeCategoryFromList(selected_category);
+            }
+        }
+
+        function submitProfile(){
+            var user_profile = $('.selected-user-id-container').attr('id');
+            var pictures_list = $('#selected-user-pics-list').children('li');
+            var categories_list = $('#profile-tags-list').children('li');
+            var user_name = $('.selected-user-name-container').attr('id');
+
+            var pictures = [];
+            var categories = [];
+            pictures_list.each(function(){
+                var location_data = $(this).children('div');
+                var img_data = $(this).children('h3');
+                var location_id = '', location_name = '', latitude = '', longitude = '';
+                var standard_resolution = '', low_resolution = '', ig_link = '';
+
+                location_data.each(function(){
+                    if($(this).attr('id') == 'id'){
+                        location_id = $(this).html();
+                    }
+                    else if($(this).attr('id') == 'name'){
+                        location_name = $(this).html();
+                    }
+                    else if($(this).attr('id') == 'latitude'){
+                        latitude = $(this).html();
+                    }
+                    else if($(this).attr('id') == 'longitude'){
+                        longitude = $(this).html();
+                    }
+                });
+
+                img_data.each(function(){
+                    if($(this).attr('id') == 'standard_resolution'){
+                        standard_resolution = $(this).html();
+                    }
+                    else if($(this).attr('id') == 'low_resolution'){
+                        low_resolution = $(this).html();
+                    }
+                    else if($(this).attr('id') == 'ig_link'){
+                        ig_link = $(this).html();
+                    }
+                });
+
+                var picture_dict = {
+                    'img_id': $(this).attr('id').replace('selected_', ''),
+                    'url': $(this).children('img').attr('src'),
+                    'standard_resolution': standard_resolution,
+                    'low_resolution': low_resolution,
+                    'ig_link': ig_link,
+                    'location_id': location_id,
+                    'location_name': location_name,
+                    'latitude': latitude,
+                    'longitude': longitude,
+                }
+                console.log(picture_dict);
+                pictures.push(picture_dict);
+            });
+
+            categories_list.each(function(){
+                categories.push($(this).attr('id'));
+            })
+
+            var json_dict = {
+                'user_id': user_profile,
+                'user_name': user_name,
+                'pictures': JSON.stringify(pictures),
+                'categories':JSON.stringify(categories),
+                'csrfmiddlewaretoken': "{{csrf_token}}",
+            }
+
+            console.log(json_dict);
+            $.ajax({
+                type: "POST",
+                url: "{% url 'instagram.api.submitUserProfile' %}",
+                data: json_dict,
+                success: function(data) {
+                    console.log(data);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+        function removeTagFromList(category_name){
+            var category_id = '#' + category_name;
+            $(category_id).remove();
+        }
+
+        function addTag(){
+            var selected_category_list = $('#profile-tags-list');
+            var selected_category = $('#profile-tag').val();
+            
+            var category_object = $('<li/>');
+            var category_name = $('<h5/>');
+
+            category_object.attr('id', selected_category);
+
+            category_name.html(selected_category);
+            category_object.append(category_name);
+
+            category_object.click(function(){
+                removeTagFromList(selected_category);
+            });
+            selected_category_list.append(category_object);
+        }
+    </script>
+</head>
+<body>
+    <p>Search Instagram Profile</p>
+    <input type="text" id="ig-user-searchfield"></input>
+    <button onclick="searchIGUsers()">Search!</button><br>
+
+    <div id="searched-users" style="width:1000px; display:inline-block;">
+        Search Results<br>
+        <ul id="searched-users-list" style="list-style-type:none;">
+        </ul>
+        <div class="selected-user-id-container">
+        </div>
+        <div class="selected-user-name-container">
+        </div>
+    </div>
+    <br>
+    <div id="user-pics" style="width:1000px; display:inline-block;">
+        User Posts<br>
+        <ul id="user-pics-list" style="list-style-type:none;">
+        </ul>
+    </div>
+    <div id="selected-user-pics" style="width:1000px; display:inline-block;">
+        Selected Photos<br>
+        <ul id="selected-user-pics-list" style="list-style-type:none;">
+        </ul>
+    </div><br>
+
+    Tags
+    <input type="text" id="profile-tag"></input>
+    <button onclick="addTag()">Add!</button><br>
+    <div id="profile-tags" style="width:1000px; display:inline-block;">
+        <ul id="profile-tags-list" style="list-style-type:none;">
+        </ul>
+    </div>
+    <br>
+    <button onclick="submitProfile()">Submit Profile!</button><br>
+
+    <div class="ig-pagination-posts">
+    </div>
+</body>
+</html>
