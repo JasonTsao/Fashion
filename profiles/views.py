@@ -29,7 +29,7 @@ def submitProfile(request):
 
 def profilePage(request):
 	ig_id = request.GET.get('ig_id', False)
-	ig_model = None
+	ig_user = None
 	tags_dict = {}
 	submitted_count = None
 	competitions = []
@@ -38,8 +38,8 @@ def profilePage(request):
 
 	if ig_id:
 		try:
-			account = Account.objects.get(ig_id=ig_id)
-			page_name = account.username
+			ig_user = Account.objects.get(ig_id=ig_id)
+			page_name = ig_user.username
 
 			'''
 			try:
@@ -115,8 +115,8 @@ def profilePage(request):
 	pf_pic = getProfilePicture(request)
 
 	if request.is_mobile:
-		return render_to_response("mobile/profiles/profile.html", {"ig_model":ig_model, "pf_pic": pf_pic, 'page_name':page_name}, context_instance=RequestContext(request))
+		return render_to_response("mobile/profiles/profile.html", {"ig_user":ig_user, "pf_pic": pf_pic, 'page_name':page_name}, context_instance=RequestContext(request))
 	else:
 		#switch to point to desktop page when we have one!
 		#return render_to_response("desktop/profiles/profile.html", {"ig_model":ig_model, "pf_pic": pf_pic, 'page_name':page_name}, context_instance=RequestContext(request))
-		return render_to_response("mobile/profiles/profile.html", {"ig_model":ig_model, "pf_pic": pf_pic, 'page_name':page_name}, context_instance=RequestContext(request))
+		return render_to_response("mobile/profiles/profile.html", {"ig_user":ig_user, "pf_pic": pf_pic, 'page_name':page_name}, context_instance=RequestContext(request))

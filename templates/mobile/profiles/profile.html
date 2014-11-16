@@ -1,0 +1,594 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load humanize %}
+
+{% block additionalHead %}
+<meta property="og:title" content="Fashion - {{page_name}}"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="http://fashion.com{{request.get_full_path}}"/>
+<meta property="og:image" content="{{ig_user.profile_picture}}"/>
+<meta property="og:site_name" content="IGHottest"/>
+<meta property="fb:admins" content="USER_ID"/>
+<meta property="og:description"
+      content="Check out {{ig_user.name}}'s hottest pictures!"/>
+<link rel="stylesheet" href="{% static 'css/profiles/profiles.css' %}">
+{% endblock %}
+
+{% block bodyContent %}
+<div id="bodycontent" style="width:100%">
+	<div id="profile-container">
+		<div class="profile-header-container profile-page-header">
+	        <div class="profile-picture-container" id="profile-picture-{{ig_user.ig_id}}">
+	            <img src="{{ig_user.profile_picture}}"></img>
+	        </div>
+	        <div class="profile-username-container">
+	            <h5>{{ig_user.name}}</h5>
+	        </div>
+	    </div>
+	    <div class="swiper-container profile-swiper-container" id="swiper-container-{{ig_user.ig_id}}">
+	        <div class="swiper-wrapper" id="{{ig_user.ig_id}}-swiper-wrapper">
+	        </div>
+
+	        <div class="pagination-wrapper">
+	            <div class="profile-pagination" id="pagination-{{ig_user.ig_id}}"></div>
+	        </div>
+	    </div>
+
+	   <div class="profile-info-container">
+	       <div class="profile-social-container">
+                {% if user.is_authenticated%}
+	            <div class="profile-follow-button-container" id="follow-button-{{ig_user.ig_id}}" onclick="followUser({{ig_user.ig_id}})">
+	                <h5>+ Follow</h5>
+	            </div>
+                {% else %}
+                <div class="profile-follow-button-container not-logged-in-button" id="follow-button-{{ig_user.ig_id}}">
+                    <h5>+ Follow</h5>
+                </div>
+                {% endif %}
+	            <div class="profile-social-button" id="posts-container-{{ig_user.ig_id}}">
+                    {% if ig_user.posts%}
+                    <h2 class="profile-social-number">{{ig_user.posts|intcomma}}</h2>
+                    {% else %}
+	                <h2 class="profile-social-number">X</h2>
+                    {% endif %}
+	                <h2 class="profile-social-text">Posts</h2>
+	            </div>
+	            <div class="profile-social-button" id="followers-container-{{ig_user.ig_id}}">
+                    {% if ig_user.followers%}
+                    <h2 class="profile-social-number">{{ig_user.followers|intcomma}}</h2>
+                    {% else %}
+	                <h2 class="profile-social-number">X</h2>
+                    {% endif %}
+	                <h2 class="profile-social-text">Followers</h2>
+	            </div>
+	            <div class="profile-social-button" id="follows-container-{{ig_user.ig_id}}">
+                    {% if ig_user.follows%}
+                    <h2 class="profile-social-number">{{ig_user.follows|intcomma}}</h2>
+                    {% else %}
+	                <h2 class="profile-social-number">X</h2>
+                    {% endif %}
+	                <h2 class="profile-social-text">Following</h2>
+	            </div>
+	        </div>
+
+		    <div class="profile-bio-container" id="profile-bio-container-{{ig_user.ig_id}}">
+		    </div>
+	    </div>
+
+	    <div id="profile-tags-container">
+	        {% for k, v in tags.items %}
+	            <div class="profile-tag-category-container" id="profile-tag-category-{{k}}" name="{{k}}">
+	                {% for category_item in v %}
+	                    <input type="checkbox" class="radio" id="profile-tag-{{k}}-{{category_item.name}}" name="{{k}}" value="{{category_item.id}}"/>
+	                    <label class="profile-category-tag-button" for="profile-tag-{{k}}-{{category_item.name}}">{{category_item.name}}</label>
+	                {% endfor %}
+	            </div>
+	        {% endfor %}
+	    </div>
+        <div class="social-share-container profile-social-container">
+            <div class="social-share-container-item facebook-share-item" onclick="fbShare('http://ighottest.com{{request.get_full_path}}')">
+                <!--<div class="fb-share-button" data-href="{{request.get_full_path }}" data-width="80"></div>-->
+                <!--<div class="fb-share-button" data-href="http://ighottest.com{{request.get_full_path}}" data-layout="icon" data-width="100"></div>-->
+                <img src="http://img2.wikia.nocookie.net/__cb20130501121248/logopedia/images/f/fb/Facebook_icon_2013.svg"></img>
+            </div>
+            <div class="social-share-container-item twitter-share-item" onclick="twitterShare('http://ighottest.com{{request.get_full_path}}', '{{ig_user.name}}')">
+                <img src="https://g.twimg.com/Twitter_logo_white.png"></img>
+            </div>
+
+            <div class="social-share-container-item pinterest-share-item" onclick="pinterestShare('http://ighottest.com{{request.get_full_path}}', '{{ig_user.name}}', '{{ig_user.profile_picture}}', 'Profile')">
+                <img src="http://icons.iconarchive.com/icons/danleech/simple/256/pinterest-icon.png"></img>
+            </div>
+            <div class="social-share-container-item gplus-share-item" onclick="googlePlusShare('http://ighottest.com{{request.get_full_path}}')">
+                <img src="http://snd1.org/wp-content/uploads/2014/04/Google-Plus-icon.png"></img>
+            </div>
+        </div>
+
+        {% if competitions%}
+        <div class="profile-page-wide-button" onclick="toggleBattleStats()">
+            <h5>Battle Stats</h5>
+        </div>
+
+        <div id="battle-stats-container" >
+            <ul id="battle-stats-list">
+            {% for competition in competitions%}
+                <li class="battle-list-li">
+                    <div class="battle-list-item-container" id="battle-{{competition.id}}">
+                        {% if user.is_authenticated%}
+                        <div class="battle-title-container" onclick="battlePage({{competition.id}})">
+                        {% else %}
+                        <div class="battle-title-container" onclick="loginProcess({% url 'competitions.views.allBattles' %}, 'battle', '{{competition.id}}')">
+                        {% endif %}
+                            <div class="battle-title-ranking-container">
+                                <h5></h5>
+                            </div>
+                            <div class="battle-title-text">
+                                <h5>{{competition.name}}</h5>
+                            </div>
+                        </div>
+
+                        <div class="battle-win-lose-container">
+                            <div class="battle-win-button toggle-selected" id="wins-button-{{competition.id}}" onclick="toggleBattleWin({{competition.id}})">
+                                <div class="battle-win-loss-text">
+                                    <h5>Wins</h5>
+                                </div>
+                                <div class="battle-win-loss-text" id="battle-win-number-{{competition.id}}">
+                                    <h5>{{competition.total_wins}}</h5>
+                                </div>
+                            </div>
+                            <div class="battle-lose-button" id="losses-button-{{competition.id}}" onclick="toggleBattleLosses({{competition.id}})">
+                                <div class="battle-win-loss-text">
+                                    <h5>Losses</h5>
+                                </div>
+                                <div class="battle-win-loss-text" id="battle-loss-number-{{competition.id}}">
+                                    <h5>{{competition.total_losses}}</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="verses-win-stats-container" id="wins-against-{{competition.id}}">
+                            <ul class="verses-stats-list">
+                                {% for profile in competition.wins %}
+                                    <li class="verses-stats-li" onclick="goToProfile({{profile.ig_id}})">
+                                        <div class="verses-stats-item-container">
+                                            <div class='verses-stats-profile-picture'>
+                                                <img src="{{profile.profile_picture}}"></img>
+                                            </div>
+                                            <div class='verses-stats-profile-name'>
+                                                <h5>{{profile.name}}</h5>
+                                            </div>
+                                            <div class='verses-stats-count'>
+                                                <h5>{{profile.count}}</h5>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {%endfor%}
+                            </ul>
+                        </div>
+
+                        <div class="verses-loss-stats-container" id="losses-against-{{competition.id}}">
+                            <ul class="verses-stats-list">
+                                {% for profile in competition.losses%}
+                                    <li class="verses-stats-li" onclick="goToProfile({{profile.ig_id}})">
+                                        <div class="verses-stats-item-container">
+                                            <div class='verses-stats-profile-picture'>
+                                                <img src="{{profile.profile_picture}}"></img>
+                                            </div>
+                                            <div class='verses-stats-profile-name'>
+                                                <h5>{{profile.name}}</h5>
+                                            </div>
+                                            <div class='verses-stats-count'>
+                                                <h5>{{profile.count}}</h5>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {%endfor%}
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+            {% endfor%}
+            </ul>
+        </div>
+        {% endif %}
+
+	   	<div id="user-submitted-pictures">
+	   		<div id="user-submitted-title-container">
+	   			<h5></h5>
+	   		</div>
+	   		<div id="user-submitted-pictures-list">
+	   			<ul id="user-submitted-pictures-ul">
+	   			</ul>
+	   		</div>
+
+            {% if user.is_authenticated%}
+            <div class="profile-page-wide-button" onclick="goToUserSubmissionPage('{{ig_user.ig_id}}', '{{ig_user.name}}')">
+                <h5>Know More?</h5>
+            </div>
+            {% else%}
+            <div class="profile-page-wide-button not-logged-in-button">
+                <h5>Know More?</h5>
+            </div>
+            {% endif %}
+	   	</div>
+	</div>
+</div>
+{% endblock%}
+
+{% block endScripts%}
+    <script>
+    	var mySwiper;
+    	$(document).ready(function() {
+            //var collection_profile_lis = $('.profile-li');
+            $('.swiper-container').each(function(){
+                $(this).height($(this).width());
+            })
+            getIGUsersData();
+            getUserSubmittedPictures("{{ig_user.ig_id}}");
+        });
+
+        function goToImagePage(ig_id, picture_id){
+            var url = "{% url 'modelProfile.views.picturePage'%}";
+            url += '?ig_id=' + ig_id + '&picture_id=' + picture_id;
+            window.location.href = url;
+        }
+
+        function goToProfile(ig_id){
+            var url = "{% url 'modelProfile.views.profilePage' %}";
+            url += '?ig_id=' + ig_id;
+            window.location.href = url;
+        }
+
+        function toggleBattleStats(){
+            $('#battle-stats-container').slideToggle('fast');
+        }
+
+        function closeBattleItem(battle_id){
+            var wins_selector = '#wins-against-' + battle_id;
+            var losses_selector = '#losses-against-' + battle_id;
+            var wins_button_selector = '#wins-button-' + battle_id;
+            var losses_button_selector = '#losses-button-' + battle_id;
+
+            $(wins_selector).slideUp('fast');
+            $(losses_selector).slideUp('fast');
+
+            $(losses_button_selector).removeClass('toggle-selected');
+            $(wins_button_selector).removeClass('toggle-selected');
+        }
+
+        function toggleBattleWin(battle_id){
+            var wins_selector = '#wins-against-' + battle_id;
+            var losses_selector = '#losses-against-' + battle_id;
+            var wins_button_selector = '#wins-button-' + battle_id;
+            var losses_button_selector = '#losses-button-' + battle_id;
+
+            $(losses_selector).slideUp('fast',function(){
+                if($(wins_button_selector).hasClass('toggle-selected')){
+                    $(wins_button_selector).removeClass('toggle-selected');
+                }else{
+                    $(wins_button_selector).addClass('toggle-selected');
+                }
+
+                $(losses_button_selector).removeClass('toggle-selected');
+                $(wins_selector).slideToggle('fast'); 
+            })
+            
+        }
+
+        function toggleBattleLosses(battle_id){
+            var wins_selector = '#wins-against-' + battle_id;
+            var losses_selector = '#losses-against-' + battle_id;
+            var wins_button_selector = '#wins-button-' + battle_id;
+            var losses_button_selector = '#losses-button-' + battle_id;
+
+            $(wins_selector).slideUp('fast',function(){
+                if($(losses_button_selector).hasClass('toggle-selected')){
+                    $(losses_button_selector).removeClass('toggle-selected');
+                }else{
+                    $(losses_button_selector).addClass('toggle-selected');
+                }
+                $(wins_button_selector).removeClass('toggle-selected');
+                $(losses_selector).slideToggle('fast'); 
+            })
+            //$(losses_selector).slideToggle();
+        }
+
+        function goToUserSubmissionPage(ig_id, username){
+            var url = "{% url 'ig.views.userSubmitProfile' %}";
+            url += '?ig_id=' + ig_id + '&username=' + username;
+            window.location.href = url;
+        }
+
+        function follow_button_switch(ig_id){
+            var follow_button = $('#follow-button-' + ig_id); 
+
+            if(follow_button.attr('class') == 'profile-follow-button-container'){
+                follow_button.attr('class', 'profile-unfollow-button-container');
+                follow_button.children('h5').html("Unfollow");
+            }
+            else if(follow_button.attr('class') == 'profile-unfollow-button-container'){
+                follow_button.attr('class', 'profile-follow-button-container');
+                follow_button.children('h5').html("+ Follow");
+            }
+        }
+
+        function followUser(ig_id){
+            url = "{% url 'ig.api.followIGUser'%}";
+            url = url + "?ig_id=" + ig_id;
+            var follow_button = $('#follow-button-' + ig_id);
+            var action = 'follow'
+
+            if(follow_button.attr('class') == 'profile-unfollow-button-container'){
+                action = 'unfollow';
+            } 
+
+            data = {
+                'ig_id':ig_id,
+                'action':action,
+                'csrfmiddlewaretoken': "{{csrf_token}}",
+            }
+
+            $.ajax({
+                type: "POST",
+                data: data,
+                url: url,
+                success: function(data) {
+                    console.log(data);
+                    follow_button_switch(ig_id);
+
+                },error: function(data) {
+                    console.log(data);
+                }
+            });
+
+        }
+
+        function getIGUsersData(){
+            var ig_id = "{{ig_user.ig_id}}";
+            getIGUserPictures(ig_id);
+            {% if user.is_authenticated %}
+                getIGUserSocialData(ig_id);
+                getIGUserRelationship(ig_id);
+           {% endif %}
+        }
+
+        function getIGUserRelationship(ig_id){
+            url = "{% url 'ig.api.checkIGUserRelationship' %}"
+            url = url + "?ig_id=" + ig_id;
+            $.ajax({
+                type: "GET",
+                url: url,
+                success: function(data) {
+                    var follow_button = $('#follow-button-' + ig_id);
+                    var relationship = data.relationship['data']['outgoing_status'];
+
+                    if(relationship == 'follows'){
+                        follow_button.attr('class', 'profile-unfollow-button-container');
+                        follow_button.children('h5').html("Unfollow");
+                    }
+                    else if(relationship == 'requested' || relationship == 'none'){
+                        follow_button.attr('class', 'profile-follow-button-container');
+                        follow_button.children('h5').html("+ Follow");
+                    }
+
+                }, error: function(data) {
+                    console.log(data);
+                }
+            });
+
+        }
+
+        function getIGUserSocialData(ig_id){
+            url = "{% url 'ig.api.getIGUserInfo'%}";
+            url = url + "?ig_id=" + ig_id;
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                success: function(data) {
+                    var profile = data.ig_profile;
+                    var follows_container = $('#follows-container-' + ig_id);
+                    var followers_container = $('#followers-container-' + ig_id);
+                    var posts_container = $('#posts-container-' + ig_id);
+                    var bio_container = $('#profile-bio-container-' + ig_id);
+
+                    var posts_count = posts_container.find('.profile-social-number');
+                    var follows_count = follows_container.find('.profile-social-number');
+                    var followers_count = followers_container.find('.profile-social-number');
+
+                    var bio_text_container = $('<p class="profile-bio-text"/>');
+
+                    follows_count.html(numberWithCommas(profile['counts']['follows']));
+                    follows_container.prepend(follows_count);
+
+                    followers_count.html(numberWithCommas(profile['counts']['followed_by']));
+                    followers_container.prepend(followers_count);
+
+                    posts_count.html(numberWithCommas(profile['counts']['media']));
+                    posts_container.prepend(posts_count);
+
+                    bio_text_container.html(profile['bio']);
+                    bio_container.append(bio_text_container);
+
+                    var profile_pic_container = $('#profile-picture-' + ig_id);
+
+                    if(!profile_pic_container.children('img').attr('src')){
+                        profile_pic_container.children('img').attr('src', profile['profile_picture']);
+                    }
+                    //var profile_pic_container = $('#profile-picture-' + ig_id);
+                    //profile_pic_container.children('img').attr('src', profile['profile_picture']);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+
+        }
+
+        function getImageIndex(swiper, swiper_id, url){
+            var swiper_obj = $(swiper_id);
+            var swiper_wrapper = swiper_obj.children('.swiper-wrapper');
+            var swiper_slides = swiper_wrapper.children('.swiper-slide:not(.swiper-slide-duplicate)');
+            var img_index;
+            var img_index_count = 0;
+
+            swiper_slides.each(function(){
+                img = $(this).children('img');
+                if(img.attr('src') == url){
+                    img_index = img_index_count
+                }
+                else{
+                    img_index_count++;
+                }
+            })
+
+            return img_index;
+        }
+
+        function validImageCallback(url, answer, swiper_id){
+
+            if(answer == false){
+                swiper = mySwiper;
+                var image_index = getImageIndex(swiper, swiper_id, url);
+
+                if(image_index === undefined){
+                    console.log('failed to remove slide for swiper: ' + swiper_id);
+                }
+                else{
+                    swiper.removeSlide(image_index);
+                }
+            }
+        }
+
+        function validSubmittedImageCallback(url, answer, img_id){
+
+            if(answer == false){
+                console.log('not a valid submitted image id!: ' + url);
+                $(img_id).remove();
+            }
+        }
+
+        function IsValidSubmittdImageUrl(url, callback, img_id) {
+            var img = new Image();
+            img.onerror = function() { callback(url, false, img_id); }
+            img.onload =  function() { callback(url, true, img_id); }
+            img.src = url;
+        }
+
+        function IsValidImageUrl(url, callback, swiper_id) {
+            var img = new Image();
+            img.onerror = function() { callback(url, false, swiper_id); }
+            img.onload =  function() { callback(url, true, swiper_id); }
+            img.src = url;
+        }
+
+        function appendPostToList(picture, ig_id){
+	    	var post_filter = 'all';
+	        var user_pictures_list = $('#user-submitted-pictures-ul');
+
+	        var li = $('<li/>');
+	        var image = $('<img/>');
+	        //var picture = data.posts[picture_index];
+	        var location_data = picture['location'];
+	                        
+	        li.attr('id', picture['id']);
+	        li.addClass('user-picture-item');
+
+	        for (location_index in location_data){
+	            var location_div = $('<div/>')
+	            location_div.attr('id', location_index);
+	            location_div.html(location_data[location_index]);
+	            location_div.css({'display':'none'});
+	            li.append(location_div);
+	        }
+
+	        //set users profile picture
+	        image.attr('src', picture['standard_resolution'])
+	        li.append(image);
+
+            var picture_id_str = '#' + picture['id']
+            IsValidSubmittdImageUrl(picture['standard_resolution'],validSubmittedImageCallback, picture_id_str);
+
+            li.click(function(){
+                var url = "{% url 'modelProfile.views.picturePage' %}";
+                url += "?picture_id=" + $(this).attr('id') + '&ig_id=' + ig_id;
+                window.location.href = url;
+            })
+
+	        //add information about other resolution picture
+	        user_pictures_list.append(li);
+    	}
+
+        function getUserSubmittedPictures(ig_id){
+        	var ig_profiles_list = $('#user-submitted-pictures-ul');
+        	var url = "{% url 'modelProfile.api.getUserSubmittedPicturesForProfile' %}";
+        	url += '?ig_id=' + ig_id;
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                success: function(data) {
+                	console.log('pulled submitted pictures!');
+                	console.log(data);
+                	var user_profile = data.user_profile
+                	for (picture_index in user_profile.pictures){
+	                	appendPostToList(user_profile.pictures[picture_index], ig_id);
+	                }
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+
+        function getIGUserPictures(ig_id){
+            var url = "{% url 'modelProfile.api.getIGModelCuratorSelectedImages' %}";
+            url = url + "?ig_id=" + ig_id;
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                success: function(data) {
+                    var swiper_wrapper_id = '#' + ig_id + '-swiper-wrapper';
+                    var swiper_wrapper = $(swiper_wrapper_id);
+
+                    var swiper_container_id = '#swiper-container-' + ig_id;
+                    var pagination_id = '#pagination-' + ig_id;
+
+                    for(picture in data.user_images){
+                        var picture_data = data.user_images[picture];
+                        var swiper_container = $('.swiper-container');
+                        var swiper_slide = $('<div class="swiper-slide"/>');
+                        var img_text = '<img onclick="goToImagePage(\'' + ig_id  +  '\',\'' + picture_data['img_id'] + '\')" class="collection-carousel-display"/>';
+
+                        var slide_img = $(img_text);
+                        var slide_rank_number = $('<div/>');
+
+                        slide_img.attr('src', picture_data['standard_resolution']);
+
+                        IsValidImageUrl(slide_img.attr('src'),validImageCallback, swiper_container_id);
+                        slide_img.css({'max-height':'100%', 'max-width':'100%'});
+
+                        swiper_slide.append(slide_img);
+                        swiper_wrapper.append(swiper_slide);
+                    }
+
+                    mySwiper = new Swiper(swiper_container_id,{
+                        mode: 'horizontal',
+                        calculateHeight:true,
+                        loop: true,
+                        //pagination: '.pagination',
+                        pagination: pagination_id,
+                        paginationClickable: true,
+                        autoResize:false,
+                    });
+
+                    //swipers[swiper_container_id] = mySwiper;
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+    </script>
+{% endblock%}

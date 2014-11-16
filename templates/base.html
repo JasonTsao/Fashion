@@ -31,14 +31,14 @@
 	<!--Open Sans from Google Fonts-->
 	<!--<link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,600' rel='stylesheet' type='text/css'>-->
 	<link href='http://fonts.googleapis.com/css?family=Oxygen:700,400|Open+Sans:400,800,700,600,300' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" href="{% static 'css/ighottest-mobile.css' %}">
+	<link rel="stylesheet" href="{% static 'css/mobile/main.css' %}">
 
 
 	{% block additionalHead %}{% endblock %}
 </head>
 <body>
 	<div id="globalwrap" data-roll="page">
-		<div class="website-logo" onclick="mainPage()"><span style="font-weight:800;color:white;position:">IG</span><span style="color:#FF5930">HOT</span><span style="color:#FF9900">TE</span><span style="color:#00CC00">ST</span></div>
+		<div class="website-logo" onclick="mainPage()"><span style="font-weight:800;color:white;position:">FA</span><span style="color:#FF5930">SH</span><span style="color:#FF9900">I</span><span style="color:#00CC00">ON</span></div>
 		{% if user.is_authenticated %}
 		<div class="header-profile-container right-profile-picture">
             <div class="header-profile-picture-container">
@@ -59,10 +59,10 @@
 					{% endif %}
 					<li><a onclick="discoveryPage()">Discovery</a></li>
 					{% if user.is_authenticated %}
-					<li><a onclick="recommendationsPage()">Know Someone Hotter?</a></li>
+					<li><a onclick="recommendationsPage()">Submit</a></li>
 					<li><a onclick="logout()">Logout</a></li>
 					{% else %}
-					<li><a onclick="loginProcess('{% url 'ig.views.userSubmitProfile' %}')">Know Someone Hotter?</a></li>
+					<li><a onclick="loginProcess('{% url 'ig.views.userSubmitProfile' %}')">Submit</a></li>
 					{% endif %}
 				</ul>
 			</nav>
