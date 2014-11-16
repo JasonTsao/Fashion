@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+	{% load staticfiles %}
+	<meta charset="utf-8">
+	<!--<meta name="viewport" content="width=640, initial-scale=1">-->
+	<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1,height=device-height">
+	<meta name="apple-mobile-web-app-capable" content="yes"/>
+	<title>Fashion{% if page_name %} - {{page_name}}{% endif %}</title>
+
+	<!--<meta name="viewport" content="width=640; initial-scale=1; maximum-scale=1; minimum-scale=1; user-scalable=0;" />-->
+
+	<!--<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">-->
+	<!--<meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1.0,maximum-scale=1.0" />-->
+	<!--jquery-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+	</script>
+	<!--jquery mobile library-->
+	<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.css" />
+	<script src="//ajax.googleapis.com/ajax/libs/jquerymobile/1.4.3/jquery.mobile.min.js"></script>
+	<!--Bootstrap CSS & JS-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+	<!-- Mean Menu CSS & JS -->
+	<script src="{% static 'js/jquery.meanmenu.js' %}"></script>
+	<link rel="stylesheet" href="{% static 'css/meanmenu.css' %}" media="all" />
+	<!-- Swiper CSS & JS -->
+	<link rel="stylesheet" href="{% static 'css/idangerous.swiper.css' %}">
+	<script defer src="{% static 'js/idangerous.swiper.js' %}"></script>
+	<!--Open Sans from Google Fonts-->
+	<!--<link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,600' rel='stylesheet' type='text/css'>-->
+	<link href='http://fonts.googleapis.com/css?family=Oxygen:700,400|Open+Sans:400,800,700,600,300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="{% static 'css/ighottest-mobile.css' %}">
+
+
+	{% block additionalHead %}{% endblock %}
+</head>
+<body>
+	<div id="globalwrap" data-roll="page">
+		<div class="website-logo" onclick="mainPage()"><span style="font-weight:800;color:white;position:">IG</span><span style="color:#FF5930">HOT</span><span style="color:#FF9900">TE</span><span style="color:#00CC00">ST</span></div>
+		{% if user.is_authenticated %}
+		<div class="header-profile-container right-profile-picture">
+            <div class="header-profile-picture-container">
+            	<img src="{{pf_pic}}"></img>
+            </div>
+        </div>
+		{% else %}
+		<div class="right-button" onclick="loginProcess('{{request.get_full_path}}')">LOGIN</div>
+		{% endif %}
+		<header>
+			<nav>
+				<ul>
+					<li><a onclick="collectionsPage()">Collections</a></li>
+					{% if user.is_authenticated %}
+						<li><a onclick="battlePage()">Battle Mode</a></li>
+					{% else %}
+						<li><a onclick="loginProcess('{% url 'competitions.views.allBattles' %}')">Battle Mode</a></li>
+					{% endif %}
+					<li><a onclick="discoveryPage()">Discovery</a></li>
+					{% if user.is_authenticated %}
+					<li><a onclick="recommendationsPage()">Know Someone Hotter?</a></li>
+					<li><a onclick="logout()">Logout</a></li>
+					{% else %}
+					<li><a onclick="loginProcess('{% url 'ig.views.userSubmitProfile' %}')">Know Someone Hotter?</a></li>
+					{% endif %}
+				</ul>
+			</nav>
+		</header>
+		<div class="base-bodycontent">
+			{% if not user.is_authenticated %}
+				<div class="login-for-full-features-container" id="login-for-full-features">
+					<a> Login For Full Features</a>
+				</div>
+			{% endif%}
+
+			{% block bodyContent %}{% endblock %}
+		</div>
+		<div class="push"></div>
+	</div>
+</body>
+	{% block endScripts %}{% endblock %}
+	<script>
+		var height = 0;
+		var previousScroll = 0;
+		$(document).ready(function() {
+			$("#topmenu-options").on("click", function() {
+				if(height === 0) {height = 200;}
+				else {height = 0;}
+				$('.base-bodycontent').css({marginTop: height});
+			});
+			$(".meanmenu-reveal").on("click", function() {
+				if(height === 0) {height = 200;}
+				else {height = 0;}
+				$('.base-bodycontent').css({marginTop: height});
+			});
+			viewPortHeight = $(window).height();
+
+			//bindHeaderAndFooterScroll();
+			{% if not user.is_authenticated %}
+				setTimeout(function () {
+					$('#login-for-full-features').fadeOut('fast')
+				}, 2000);
+			{% endif %}
+
+			$(document).click(function(e) {
+				if($(e.target).attr('class') != "meanmenu-reveal meanclose" && !$(e.target).is('span')){
+					if($('.meanmenu-reveal').hasClass('meanclose')){
+						$('.meanmenu-reveal').click();
+					}
+				}
+				else{
+					console.log('did click meanmenu reveal');
+				}
+			});
+		});
+		jQuery(document).ready(function() {
+			jQuery('header nav').meanmenu();
+		})
+
+		function bindHeaderAndFooterScroll(){
+			$(window).scroll(function() {
+                var currentScroll = $(this).scrollTop();
+		        if (currentScroll > previousScroll){
+		        	$('.mean-bar').slideUp(100);
+			        $('.website-logo').slideUp(100);
+		            
+		        } else {
+		        	$('.mean-bar').slideDown(100);
+		        	$('.website-logo').slideDown(100);   	
+		        }
+		        previousScroll = currentScroll;
+
+		    });
+		}
+
+		function fbShare(url){
+            var encoded_url = encodeURIComponent(url);
+            var fb_sharer_url = 'https://www.facebook.com/sharer/sharer.php?app_id=309437425817038&sdk=joey&u='
+            fb_sharer_url += encoded_url + '&display=popup&ref=plugin'
+            javascript:window.open(fb_sharer_url,'title');
+        }
+
+        function twitterShare(url, twitter_text){
+            var encoded_url = encodeURIComponent(url);
+            var encoded_text = encodeURIComponent(twitter_text);
+            var twitter_sharer_url = 'https://twitter.com/intent/tweet?url=' + encoded_url + '&via=ighottest&text=' + encoded_text;
+            javascript:window.open(twitter_sharer_url,'title');
+        }
+
+        function pinterestShare(url, pinterest_text, pinterest_img, pin_type){
+        	var encoded_url = encodeURIComponent(url);
+        	var encoded_image = encodeURIComponent(pinterest_img)
+
+        	var text_to_encode = 'IGHottest - ' + pin_type + ': ' + pinterest_text;
+
+        	var encoded_text = encodeURIComponent(text_to_encode)
+        	var pinterest_sharer_url = "http://www.pinterest.com/pin/create/button/?url=" + encoded_url +  "&media=" + encoded_image + "&description=" + encoded_text;
+        	javascript:window.open(pinterest_sharer_url,'title');
+        }
+
+        function googlePlusShare(url){
+        	//var encoded_url = encodeURIComponent(url);
+            var gplus_sharer_url = 'https://plus.google.com/share?url='
+            gplus_sharer_url += url;
+            javascript:window.open(gplus_sharer_url,'title');
+        }
+
+		function numberWithCommas(x) {
+            if( x !== null){
+                return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            else{
+                return 'X';
+            }
+            
+        }
+
+		function loginProcess(next, page_type, page_id) {
+			var login_url = "{% url 'instagram.api.connectInstagram' %}"
+
+
+			login_url += '?next=' + $.trim(next);
+
+			if( page_type == 'battle'){
+				login_url += page_id
+			}
+			else if(page_type == 'collection'){
+				login_url += '?id=' + page_id
+			}
+
+			window.location= login_url;
+		}
+		function logout() {
+			window.location.href="/logout";
+		}
+	</script>
+</html>
