@@ -23,7 +23,7 @@ class Picture(models.Model):
 	modified = models.DateTimeField(auto_now=True)
 	def __unicode__(self):
 		try:
-			return str('{0}: {1}'.format(self.owner.username,self.standard_resolution_url)).decode().encode('utf-8')
+			return str('{0}: {1}'.format(self.owner.username,self.picture_id)).decode().encode('utf-8')
 		except Exception as e:
 			print "Can't be displayed"
 

@@ -17,6 +17,9 @@ from django.shortcuts import redirect
 from django.http import HttpResponse, HttpResponseRedirect
 
 from accounts.models import Account
+from pictures.models import Picture
+from instagram.utils import getAllFollowing, searchUsersByName, getIGUserPosts, getAuthenticatedUserPosts, getIGUserData, followUser, getIGUserRelationship
+
 
 MAX_POST_RETURN = 100
 MAX_USER_POST_RETURN = 20
@@ -65,7 +68,6 @@ def OAuth(request):
 		conn = urllib2.urlopen(REQUEST_ACCESS_TOKEN, data=data)
 		try:
 			response = json.loads(conn.read())
-			print response
 			try:
 				user = None
 				if len(Account.objects.filter(ig_id=response["user"]["id"])) < 1:
@@ -271,3 +273,88 @@ def getUserPosts(request):
 	except Exception as e:
 		rtn_dict['msg'] = 'Unable to get posts from user {0}: {1}'.format(user_id, e)
 	return HttpResponse(json.dumps(rtn_dict, indent=4), content_type="application/json")
+
+
+@login_required
+def submitUserProfile(request):
+	rtn_dict = {'success':False, 'msg': '', 'user_dict':{}}
+
+	try:
+		user_dict = {}
+		user_id = request.POST['user_id']
+		user_name = request.POST['user_name']
+		categories = json.loads(request.POST['categories'])
+		user_pics = json.loads(request.POST['pictures'])
+
+		try:
+			# get or create IGModel from user submission data
+
+			if len(Account.objects.filter(ig_id=user_id)) < 1:
+				user = User.objects.create_user(username=user_name,
+												password=user_id)
+			else:
+				account = Account.objects.get(ig_id=user_id)
+				user = account.user
+
+			account, created = Account.objects.get_or_create(user=user, ig_id=user_id, username=user_name)
+
+			if created:
+				account.active = False
+				account.save()
+
+			'''
+			for category in categories:
+				try:
+					if request.user.is_staff:
+						tag, created = Tag.objects.get_or_create(name=category)
+					else:
+						tag = Tag.objects.get(name=category)
+					new_category, created = ModelUserSubmittedTag.objects.get_or_create(user=account, owner=ig_model, tag=tag)
+				except Exception as e:
+					print 'Unable to submit user profile category : {0}'.format(e)
+					rtn_dict['categories_msg'] = 'Unable to submit user profile category : {0}'.format(e)
+			'''
+
+			#save pictures associated with this user
+			for picture in user_pics:
+				try:
+					saved_pic, created = Picture.objects.get_or_create(owner=account, thumbnail_url=picture['url'], picture_id=picture['img_id'])
+					try:
+						saved_pic.standard_resolution_url = picture['standard_resolution'] if picture['standard_resolution'] else None
+						saved_pic.low_resolution_url = picture['low_resolution'] if picture['low_resolution'] else None
+						saved_pic.ig_link = picture['ig_link'] if picture['ig_link'] else None
+					except Exception as e:
+						print 'Unable to save other image size data for ModelUserSubmittedPicture: {0}'.format(e)
+					try:
+						saved_pic.latitude = picture['latitude'] if picture['latitude'] else None
+						saved_pic.longitude = picture['longitude'] if picture['longitude'] else None
+						saved_pic.location_id = picture['location_id']
+						saved_pic.location_name = picture['location_name']
+						saved_pic.save()
+					except Exception as e:
+						print 'Unable to save IG user picture latitude and logitude coordinate data: {0}'.format(e)
+				except Exception as e:
+					print 'Unable to save IG user picture: {0}'.format(e)
+					rtn_dict['picture_msg'] = 'Unable to save IG user picture: {0}'.format(e)
+
+			'''
+			#check if user already has curated pictures and a curated account with us
+			try:
+				curated_pics = ModelPicture.objects.filter(owner=ig_model)
+				if len(curated_pics) > 0:
+					rtn_dict['curated_profile'] = True
+			except:
+				rtn_dict['curated_profile'] = False
+			'''
+
+
+			rtn_dict['user_dict'] = request.POST
+		except Exception as e:
+			print 'Unable to retrieve logged in users account: {0}'.format(e)
+			rtn_dict['user_msg'] = 'Unable to retrieve logged in users account: {0}'.format(e)
+		
+	except Exception as e:
+		print 'Unable to submit user profile to our system: {0}'.format(e)
+		rtn_dict['submission_msg'] = 'Unable to submit user profile to our system: {0}'.format(e)
+
+	return HttpResponse(json.dumps(rtn_dict), content_type="application/json")

@@ -11,8 +11,6 @@ from random import randint
 
 from accounts.models import Account
 
-from ig.utils import getAllFollowing, searchUsersByName, getIGUserPosts, getAuthenticatedUserPosts, getIGUserData, followUser, getIGUserRelationship
-
 NUM_PAGINATIONS = 2
 
 

@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('auth.urls')),
     url(r'^instagram_api/', include('instagram.urls')),
     url(r'^discover/', include('discovery.urls')),
+    url(r'^profile/', include('profiles.urls')),
     # url(r'^$', 'Fashion.views.home', name='home'),
     # url(r'^Fashion/', include('Fashion.foo.urls')),
 
