@@ -13,4 +13,3 @@ psycopg2==2.4.5
 pillow
 requests
 gunicorn
-django_mobile

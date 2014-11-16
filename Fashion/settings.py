@@ -98,15 +98,14 @@ TEMPLATE_DIRS = (
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django_mobile.loader.Loader',
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.request',
     'django.contrib.auth.context_processors.auth',
-    'django_mobile.context_processors.flavour',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -115,8 +114,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django_mobile.middleware.MobileDetectionMiddleware',
-    'django_mobile.middleware.SetFlavourMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'Fashion.middleware.MobileDetectionMiddleware',
@@ -178,7 +175,9 @@ LOGGING = {
     }
 }
 
+'''
 try:
     from local_settings import *
 except ImportError:
     print "Can't import local settings for some reason..."
+'''

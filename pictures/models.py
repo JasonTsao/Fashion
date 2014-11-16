@@ -28,6 +28,11 @@ class Picture(models.Model):
 			print "Can't be displayed"
 
 
+class SelectedPicture(models.Model):
+	owner = models.ForeignKey(Account)
+	picture = models.ForeignKey(Picture)
+
+
 class BrandCategory(models.Model):
 	name = models.CharField(max_length=255, unique=True)
 	def __unicode__(self):
