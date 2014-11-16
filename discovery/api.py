@@ -4,7 +4,7 @@ from django.template import RequestContext
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
 
-from models import Article, PictureArticleTag, Picture
+from pictures.models import Article, PictureArticleTag, Picture
 
 import json
 
