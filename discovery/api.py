@@ -7,6 +7,7 @@ from models import Article, PictureArticleTag
 
 import json
 
+PICTURES_PER_PAGE = 20
 
 def paginatedQueryList(request):
 	rtn_dict = {"success": False}
@@ -22,10 +23,22 @@ def paginatedQueryList(request):
 				queried_tags.extends(Article.objects.filter(category__id=article_id))
 			article_tags = []
 			for queried_tag in queried_tags:
-				article_tags.extends(PictureArticleTag.objects.filter(article=queried_tag))
+				if last_id:
+					article_tags.extends(PictureArticleTag.objects.filter((Q(article=queried_tag)&Q(id__gt=last_id))))
+				else:
+					article_tags.extends(PictureArticleTag.objects.filter(article=queried_tag))
+			article_tags.sort(key=lambda x: x.id, reverse=True)
 			rtn_dict["response"] = {"pictures": []}
+			picture_ids = []
+			count = 0
 			for article_tag in article_tag:
-				rtn_dict["response"]["pictures"].append(model_to_dict(article_tag.picture))
+				picture = article_tag.picture
+				if not article_tag.picture.id in picture_ids:
+					picture_ids.append(picture.id)
+					rtn_dict["response"]["pictures"].append(model_to_dict(picture))
+					count = count + 1
+					if count >= PICTURES_PER_PAGE:
+						rtn_dict["response"]["lastId"] = picture.id
 			rtn_dict["success"] = True
 		else:
 			rtn_dict["error"] = "No valid query parameters provided in POST data"
