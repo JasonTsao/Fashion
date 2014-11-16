@@ -20,9 +20,11 @@ from pictures.models import Picture
 
 
 def submitProfile(request):
-	print 'flavour'
-	print request.flavour
-	return render_to_response("desktop/admin/user_submission/user_submission.html", {}, context_instance=RequestContext(request))
+	if request.is_mobile:
+		#SHOULD REALLY SEND THEM TO A DEFAULT PAGE
+		return render_to_response("mobile/admin/user_submission/user_submission.html", {}, context_instance=RequestContext(request))
+	else:
+		return render_to_response("desktop/admin/user_submission/user_submission.html", {}, context_instance=RequestContext(request))
 
 
 def profilePage(request):
@@ -112,4 +114,9 @@ def profilePage(request):
 
 	pf_pic = getProfilePicture(request)
 
-	return render_to_response("profiles/profile.html", {"ig_model":ig_model, "pf_pic": pf_pic, 'page_name':page_name}, context_instance=RequestContext(request))
+	if request.is_mobile:
+		return render_to_response("mobile/profiles/profile.html", {"ig_model":ig_model, "pf_pic": pf_pic, 'page_name':page_name}, context_instance=RequestContext(request))
+	else:
+		#switch to point to desktop page when we have one!
+		#return render_to_response("desktop/profiles/profile.html", {"ig_model":ig_model, "pf_pic": pf_pic, 'page_name':page_name}, context_instance=RequestContext(request))
+		return render_to_response("mobile/profiles/profile.html", {"ig_model":ig_model, "pf_pic": pf_pic, 'page_name':page_name}, context_instance=RequestContext(request))

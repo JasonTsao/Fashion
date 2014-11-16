@@ -119,6 +119,7 @@ MIDDLEWARE_CLASSES = (
     'django_mobile.middleware.SetFlavourMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'Fashion.middleware.MobileDetectionMiddleware',
 )
 
 ROOT_URLCONF = 'Fashion.urls'
