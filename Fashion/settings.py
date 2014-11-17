@@ -103,6 +103,11 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.request',
+    'django.contrib.auth.context_processors.auth',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -111,6 +116,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'Fashion.middleware.MobileDetectionMiddleware',
 )
 
 ROOT_URLCONF = 'Fashion.urls'
@@ -126,6 +132,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'south',
     'accounts',
     'discovery',
@@ -168,7 +175,9 @@ LOGGING = {
     }
 }
 
+'''
 try:
     from local_settings import *
 except ImportError:
     print "Can't import local settings for some reason..."
+'''

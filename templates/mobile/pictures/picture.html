@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block additionalHead %}
+<meta property="og:title" content="IGHottest - {{page_name}}"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="http://ighottest.com{{request.get_full_path}}"/>
+<meta property="og:image" content="{{picture.standard_resolution_url}}"/>
+<meta property="og:site_name" content="IGHottest"/>
+<meta property="fb:admins" content="USER_ID"/>
+<meta property="og:description"
+      content="{{ig_model.name}}'s"/>
+<link rel="stylesheet" href="{% static 'css/mobile/profiles/profiles.css' %}">
+{% endblock %}
+
+{% block bodyContent %}
+<div id="bodycontent" style="width:100%">
+	<div id="picture-container">
+		<div class="profile-header-container profile-page-header">
+	        <div class="profile-picture-container" id="profile-picture-{{ig_model.ig_id}}">
+	            <img src="{{ig_model.profile_picture}}"></img>
+	        </div>
+	        <div class="profile-username-container">
+	            <h5>{{ig_model.username}}</h5>
+	        </div>
+	    </div>
+	    <div class="picture-img-container">
+	        <img src="{{picture.standard_resolution_url}}"></img>
+	    </div>
+
+        <!--
+        <div class="social-share-container profile-social-container">
+            <div class="social-share-container-item facebook-share-item" onclick="fbShare('http://ighottest.com{{request.get_full_path}}')">
+                <img src="http://img2.wikia.nocookie.net/__cb20130501121248/logopedia/images/f/fb/Facebook_icon_2013.svg"></img>
+            </div>
+            <div class="social-share-container-item twitter-share-item" onclick="twitterShare('http://ighottest.com{{request.get_full_path}}', '{{ig_model.name}}')">
+                <img src="https://g.twimg.com/Twitter_logo_white.png"></img>
+            </div>
+
+            <div class="social-share-container-item pinterest-share-item" onclick="pinterestShare('http://ighottest.com{{request.get_full_path}}', '{{ig_model.name}}', '{{ig_model.profile_picture}}', 'Picture')">
+                <img src="http://icons.iconarchive.com/icons/danleech/simple/256/pinterest-icon.png"></img>
+            </div>
+            <div class="social-share-container-item gplus-share-item" onclick="googlePlusShare('http://ighottest.com{{request.get_full_path}}')">
+                <img src="http://snd1.org/wp-content/uploads/2014/04/Google-Plus-icon.png"></img>
+            </div>
+        </div>-->
+	</div>
+</div>
+{% endblock%}
+
+{% block endScripts%}
+    <script>
+    	$(document).ready(function() {
+            $('.picture-img-container').height($('.picture-img-container').width());
+
+            var profile_pic_container = $('#profile-picture-{{ig_model.ig_id}}');
+            {% if not ig_model.profile_picture%}
+                getIGUserSocialData("{{ig_model.ig_id}}");
+            {% endif %};
+            {% if not user_voted and user.is_authenticated%}
+                $('#picture-vote-button').click(function(){
+                    voteForPicture();
+                })
+            {% endif %}
+        });
+        
+        function getIGUserSocialData(ig_id){
+            url = "{% url 'instagram.api.getIGUserInfo'%}";
+            url = url + "?ig_id=" + ig_id;
+
+            $.ajax({
+                type: "GET",
+                url: url,
+                success: function(data) {
+                    var profile = data.ig_profile;
+                    var profile_pic_container = $('#profile-picture-' + ig_id);
+                    profile_pic_container.children('img').attr('src', profile['profile_picture']);
+                },
+                error: function(data) {
+                    console.log(data);
+                }
+            });
+        }
+
+    </script>
+{% endblock%}
