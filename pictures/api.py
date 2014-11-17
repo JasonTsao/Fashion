@@ -31,11 +31,11 @@ def paginatedGlobalImages(request):
 	return HttpResponse(json.dumps(rtn_dict), "application/json")
 
 
-<<<<<<< HEAD
 def paginatedRegionalImages(request):
 	rtn_dict = {"success": False}
 	return HttpResponse(json.dumps(rtn_dict), "application/json")
-=======
+
+
 def modelProfileDictionary(account):
 	try:
 		#ig_model = IGModel.objects.get(pk=model_id)
@@ -135,4 +135,3 @@ def getUserPictures(request):
 			print 'Unable to get IG User submitted profile: {0}'.format(e)
 
 	return HttpResponse(json.dumps(rtn_dict), "application/json")
->>>>>>> b0c2871b9b47535f0c8a98a349f407671a5bcd3a
